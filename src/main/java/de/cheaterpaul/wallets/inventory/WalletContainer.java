@@ -1,10 +1,9 @@
 package de.cheaterpaul.wallets.inventory;
 
-import de.cheaterpaul.wallets.REFERENCE;
 import de.cheaterpaul.wallets.WalletsMod;
-import de.cheaterpaul.wallets.items.CoinItem;
 import de.cheaterpaul.wallets.items.CoinPouchItem;
 import de.cheaterpaul.wallets.items.ICoinContainer;
+import de.cheaterpaul.wallets.items.Numismatics;
 import de.cheaterpaul.wallets.items.WalletItem;
 import de.cheaterpaul.wallets.network.UpdateWalletPacket;
 import net.minecraft.resources.ResourceLocation;
@@ -30,7 +29,7 @@ public class WalletContainer extends AbstractContainerMenu {
     private int walletAmount;
     private int walletPos;
     private final Player player;
-    private final Map<CoinItem.CoinValue, TakeOnlySlot> coinSlots;
+    private final Map<Numismatics.Tier, TakeOnlySlot> coinSlots;
     private ICoinChangeListener changeListener;
 
     @SuppressWarnings("DeprecatedIsStillUsed")
@@ -43,7 +42,7 @@ public class WalletContainer extends AbstractContainerMenu {
         super(WalletsMod.WALLET_CONTAINER.get(), id);
         this.player = playerInventory.player;
         this.walletStack = stack;
-        this.inventory = new SimpleContainer(8);
+        this.inventory = new SimpleContainer(7);
         this.coinSlots = new HashMap<>();
         this.addSlots(inventory);
         this.addPlayerSlots(playerInventory);
@@ -77,14 +76,14 @@ public class WalletContainer extends AbstractContainerMenu {
     }
 
     protected void addSlots(Container inventory) {
-        this.addSlot(new CoinSlot(inventory, 0, 118, 20, (stack) -> stack.getItem() instanceof ICoinContainer));
-        this.addSlot(new TakeOnlySlot(CoinItem.CoinValue.ONE, inventory, 1, 26, 70,new ResourceLocation(REFERENCE.MOD_ID,"item/coin_one")));
-        this.addSlot(new TakeOnlySlot(CoinItem.CoinValue.FIVE, inventory, 2, 44, 70,new ResourceLocation(REFERENCE.MOD_ID,"item/coin_five")));
-        this.addSlot(new TakeOnlySlot(CoinItem.CoinValue.TEN, inventory, 3, 62, 70,new ResourceLocation(REFERENCE.MOD_ID,"item/coin_ten")));
-        this.addSlot(new TakeOnlySlot(CoinItem.CoinValue.TWENTY, inventory, 4, 80, 70,new ResourceLocation(REFERENCE.MOD_ID,"item/coin_twenty")));
-        this.addSlot(new TakeOnlySlot(CoinItem.CoinValue.FIFTY, inventory, 5, 98, 70,new ResourceLocation(REFERENCE.MOD_ID,"item/coin_fifty")));
-        this.addSlot(new TakeOnlySlot(CoinItem.CoinValue.ONE_HUNDRED, inventory, 6, 116, 70,new ResourceLocation(REFERENCE.MOD_ID,"item/coin_one_hundred")));
-        this.addSlot(new TakeOnlySlot(CoinItem.CoinValue.FIVE_HUNDRED, inventory, 7, 134, 70,new ResourceLocation(REFERENCE.MOD_ID,"item/coin_five_hundred")));
+        this.addSlot(new CoinSlot(inventory, 0, 118, 20, (stack) ->
+                stack.getItem() instanceof ICoinContainer || Numismatics.isSupported(stack.getItem())));
+        this.addSlot(new TakeOnlySlot(Numismatics.Tier.SPUR, inventory, 1, 34, 70,new ResourceLocation("numismatics","item/spur")));
+        this.addSlot(new TakeOnlySlot(Numismatics.Tier.BEVEL, inventory, 2, 52, 70,new ResourceLocation("numismatics","item/bevel")));
+        this.addSlot(new TakeOnlySlot(Numismatics.Tier.SPROCKET, inventory, 3, 70, 70,new ResourceLocation("numismatics","item/sprocket")));
+        this.addSlot(new TakeOnlySlot(Numismatics.Tier.COG, inventory, 4, 88, 70,new ResourceLocation("numismatics","item/cog")));
+        this.addSlot(new TakeOnlySlot(Numismatics.Tier.CROWN, inventory, 5, 106, 70,new ResourceLocation("numismatics","item/crown")));
+        this.addSlot(new TakeOnlySlot(Numismatics.Tier.SUN, inventory, 6, 124, 70,new ResourceLocation("numismatics","item/sun")));
     }
 
     protected void addPlayerSlots(Inventory playerInventory) {
@@ -148,11 +147,22 @@ public class WalletContainer extends AbstractContainerMenu {
         if (player.level().isClientSide) return;
         ItemStack stack = this.inventory.getItem(0);
         if (!stack.isEmpty()) {
-            int coin_value = (((ICoinContainer) stack.getItem()).getCoins(stack));
-            if (getWalletAmount() + coin_value > 999999999) return; // limit wallet amount to ensure right screen rendering
-            if ((((ICoinContainer) stack.getItem()).containsCoins())) {
-                (((ICoinContainer) stack.getItem())).clear(stack);
-            } else if (((ICoinContainer) stack.getItem()).removedOnUsage()) {
+            int coin_value;
+            if (stack.getItem() instanceof ICoinContainer) {
+                coin_value = (((ICoinContainer) stack.getItem()).getCoins(stack));
+            } else if (Numismatics.isSupported(stack.getItem())) {
+                coin_value = stack.getCount() * Numismatics.getUnitValue(stack.getItem());
+            } else {
+                return;
+            }
+            if (getWalletAmount() + coin_value > 999999) return; // limit wallet amount to ensure right screen rendering
+            if (stack.getItem() instanceof ICoinContainer) {
+                if ((((ICoinContainer) stack.getItem()).containsCoins())) {
+                    (((ICoinContainer) stack.getItem())).clear(stack);
+                } else if (((ICoinContainer) stack.getItem()).removedOnUsage()) {
+                    this.inventory.setItem(0, ItemStack.EMPTY);
+                }
+            } else {
                 this.inventory.setItem(0, ItemStack.EMPTY);
             }
             this.addWalletCoins(coin_value);
@@ -164,13 +174,13 @@ public class WalletContainer extends AbstractContainerMenu {
         WalletsMod.dispatcher.sentToPlayer(new UpdateWalletPacket(this.walletAmount, this.walletPos), ((ServerPlayer) this.player));
     }
 
-    public void takeCoin(CoinItem.CoinValue value) {
+    public void takeCoin(Numismatics.Tier value) {
         takeCoin(value,1);
     }
 
-    public void takeCoin(CoinItem.CoinValue type, int amount) {
+    public void takeCoin(Numismatics.Tier type, int amount) {
         assert amount <= 64;
-        int coinValue = type.getValue();
+        int coinValue = Numismatics.getUnit(type);
         int coins = Math.min(WalletItem.getCoinValue(this.walletStack) / coinValue, amount);
         ItemStack slot = this.coinSlots.get(type).getItem();
         coins = Math.min(coins, slot.getMaxStackSize() - slot.getCount());
@@ -178,11 +188,11 @@ public class WalletContainer extends AbstractContainerMenu {
         addWalletCoins(-coins * coinValue);
     }
 
-    private void _takeCoin(CoinItem.CoinValue value, int amount) {
+    private void _takeCoin(Numismatics.Tier value, int amount) {
         if (amount <= 0) return;
         ItemStack stack = this.inventory.getItem(value.ordinal() + 1);
         if (stack.isEmpty()) {
-            this.inventory.setItem(value.ordinal() + 1, new ItemStack(CoinItem.getCoin(value), amount));
+            this.inventory.setItem(value.ordinal() + 1, new ItemStack(Numismatics.getItemFor(value), amount));
         } else {
             stack.grow(amount);
         }
@@ -194,13 +204,13 @@ public class WalletContainer extends AbstractContainerMenu {
             value = WalletItem.getCoinValue(this.walletStack);
         }
         int remaining = value;
-        for (int i = CoinItem.CoinValue.values().length - 1; i >= 0; i--) {
-            CoinItem.CoinValue v = CoinItem.CoinValue.values()[i];
-            int amount = remaining / v.getValue();
-            remaining -= amount * v.getValue();
+        for (Numismatics.Tier v : Numismatics.orderedByValueDesc()) {
+            int unit = Numismatics.getUnit(v);
+            int amount = remaining / unit;
+            remaining -= amount * unit;
             while (amount > 0){
-                CoinItem item = CoinItem.getCoin(v);
-                int stackSize = Mth.clamp(amount,0, item.getMaxStackSize());
+                var item = Numismatics.getItemFor(v);
+                int stackSize = Mth.clamp(amount,0, new ItemStack(item).getMaxStackSize());
                 amount -= stackSize;
                 player.getInventory().placeItemBackInInventory(new ItemStack(item, stackSize));
             }
@@ -277,7 +287,7 @@ public class WalletContainer extends AbstractContainerMenu {
 
         private ResourceLocation texture;
 
-        public TakeOnlySlot(CoinItem.CoinValue coin, Container p_i1824_1_, int p_i1824_2_, int p_i1824_3_, int p_i1824_4_, ResourceLocation texture) {
+        public TakeOnlySlot(Numismatics.Tier coin, Container p_i1824_1_, int p_i1824_2_, int p_i1824_3_, int p_i1824_4_, ResourceLocation texture) {
             super(p_i1824_1_, p_i1824_2_, p_i1824_3_, p_i1824_4_);
             this.texture = texture;
             coinSlots.put(coin, this);

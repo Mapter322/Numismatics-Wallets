@@ -1,7 +1,7 @@
 package de.cheaterpaul.wallets.network;
 
 import de.cheaterpaul.wallets.inventory.WalletContainer;
-import de.cheaterpaul.wallets.items.CoinItem;
+import de.cheaterpaul.wallets.items.Numismatics;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.inventory.AbstractContainerMenu;
@@ -11,10 +11,10 @@ import java.util.function.Supplier;
 
 public class TakeCoinPacket {
 
-    private final CoinItem.CoinValue type;
+    private final Numismatics.Tier type;
     private final int amount;
 
-    public TakeCoinPacket(CoinItem.CoinValue type, int amount) {
+    public TakeCoinPacket(Numismatics.Tier type, int amount) {
         this.type = type;
         this.amount = amount;
     }
@@ -25,7 +25,7 @@ public class TakeCoinPacket {
     }
 
     static TakeCoinPacket decode(FriendlyByteBuf buf) {
-        return new TakeCoinPacket(CoinItem.CoinValue.values()[buf.readInt()], buf.readInt());
+        return new TakeCoinPacket(Numismatics.Tier.values()[buf.readInt()], buf.readInt());
     }
 
     public static void handle(final TakeCoinPacket msg, Supplier<NetworkEvent.Context> contextSupplier) {

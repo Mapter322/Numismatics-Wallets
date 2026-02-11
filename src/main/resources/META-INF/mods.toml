@@ -26,3 +26,9 @@ Coins of different value and a wallet to store coins easily.
     versionRange="[${mc_version},)"
     ordering="NONE"
     side="BOTH"
+[[dependencies.wallets]]
+    modId="numismatics"
+    mandatory=true
+    versionRange="[0,)"
+    ordering="NONE"
+    side="BOTH"

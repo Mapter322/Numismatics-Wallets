@@ -1,7 +1,7 @@
 package de.cheaterpaul.wallets.network;
 
 import de.cheaterpaul.wallets.inventory.WalletContainer;
-import de.cheaterpaul.wallets.items.CoinItem;
+import de.cheaterpaul.wallets.items.Numismatics;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.inventory.AbstractContainerMenu;
@@ -14,9 +14,6 @@ public class InputEventPacket {
     public static final String TAKE_COIN = "tc";
     public static final String TAKE_COINS = "tcs";
     public static final String CREATE_POUCH = "cp";
-    public static final String UPDATE_WALLET = "uw";
-    public static final String UPDATE_WALLET_TAKE = "uwt";
-
     private static final String SPLIT = "&";
 
     private String action;
@@ -58,7 +55,7 @@ public class InputEventPacket {
             if (menu instanceof WalletContainer) {
                 switch (msg.action) {
                     case INSERT_COIN -> ((WalletContainer) menu).insertCoin();
-                    case TAKE_COIN -> ((WalletContainer) menu).takeCoin(CoinItem.CoinValue.valueOf(msg.param));
+                    case TAKE_COIN -> ((WalletContainer) menu).takeCoin(Numismatics.Tier.valueOf(msg.param));
                     case TAKE_COINS -> ((WalletContainer) menu).takeCoins(Integer.parseInt(msg.param));
                     case CREATE_POUCH -> ((WalletContainer) menu).createPouch(Integer.parseInt(msg.param));
                 }

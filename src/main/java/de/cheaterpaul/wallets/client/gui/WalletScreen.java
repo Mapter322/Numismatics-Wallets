@@ -6,8 +6,8 @@ import de.cheaterpaul.wallets.WalletsMod;
 import de.cheaterpaul.wallets.config.Config;
 import de.cheaterpaul.wallets.inventory.ICoinChangeListener;
 import de.cheaterpaul.wallets.inventory.WalletContainer;
-import de.cheaterpaul.wallets.items.CoinItem;
 import de.cheaterpaul.wallets.items.ICoinContainer;
+import de.cheaterpaul.wallets.items.Numismatics;
 import de.cheaterpaul.wallets.network.InputEventPacket;
 import de.cheaterpaul.wallets.network.TakeCoinPacket;
 import net.minecraft.ChatFormatting;
@@ -58,20 +58,19 @@ public class WalletScreen extends AbstractContainerScreen<WalletContainer> imple
         this.depositButton = this.addRenderableWidget(new ImageButton(this.getGuiLeft() + 104, this.getGuiTop() + 23, 7, 11, 190, 0, 11, BACKGROUND, 256, 256, this::walletApplyPressed));
         this.updateDepositButton();
 
-        var takeOne = this.addRenderableWidget(new AddWalletButton(this.getGuiLeft() + 27, this.getGuiTop() + 53, 14, 14, 176, 0, 14, BACKGROUND, 256, 256, this::walletTakeCoinPressed, Component.empty(), CoinItem.CoinValue.ONE));
-        takeOne.setTooltip(Tooltip.create(Component.translatable("text.wallets.take_coin", Component.translatable(CoinItem.CoinValue.ONE.getTranslation()))));
-        var takeFive = this.addRenderableWidget(new AddWalletButton(this.getGuiLeft() + 45, this.getGuiTop() + 53, 14, 14, 176, 0, 14, BACKGROUND, 256, 256, this::walletTakeCoinPressed, Component.empty(), CoinItem.CoinValue.FIVE));
-        takeFive.setTooltip(Tooltip.create(Component.translatable("text.wallets.take_coin", Component.translatable(CoinItem.CoinValue.FIVE.getTranslation()))));
-        var takeTen = this.addRenderableWidget(new AddWalletButton(this.getGuiLeft() + 63, this.getGuiTop() + 53, 14, 14, 176, 0, 14, BACKGROUND, 256, 256, this::walletTakeCoinPressed, Component.empty(), CoinItem.CoinValue.TEN));
-        takeTen.setTooltip(Tooltip.create(Component.translatable("text.wallets.take_coin", Component.translatable(CoinItem.CoinValue.TEN.getTranslation()))));
-        var takeTwenty = this.addRenderableWidget(new AddWalletButton(this.getGuiLeft() + 81, this.getGuiTop() + 53, 14, 14, 176, 0, 14, BACKGROUND, 256, 256, this::walletTakeCoinPressed, Component.empty(), CoinItem.CoinValue.TWENTY));
-        takeTwenty.setTooltip(Tooltip.create(Component.translatable("text.wallets.take_coin", Component.translatable(CoinItem.CoinValue.TWENTY.getTranslation()))));
-        var takeFifty = this.addRenderableWidget(new AddWalletButton(this.getGuiLeft() + 99, this.getGuiTop() + 53, 14, 14, 176, 0, 14, BACKGROUND, 256, 256, this::walletTakeCoinPressed, Component.empty(), CoinItem.CoinValue.FIFTY));
-        takeFifty.setTooltip(Tooltip.create(Component.translatable("text.wallets.take_coin", Component.translatable(CoinItem.CoinValue.FIFTY.getTranslation()))));
-        var takeHundred = this.addRenderableWidget(new AddWalletButton(this.getGuiLeft() + 117, this.getGuiTop() + 53, 14, 14, 176, 0, 14, BACKGROUND, 256, 256, this::walletTakeCoinPressed, Component.empty(), CoinItem.CoinValue.ONE_HUNDRED));
-        takeHundred.setTooltip(Tooltip.create(Component.translatable("text.wallets.take_coin", Component.translatable(CoinItem.CoinValue.ONE_HUNDRED.getTranslation()))));
-        var takeFiveHundred = this.addRenderableWidget(new AddWalletButton(this.getGuiLeft() + 135, this.getGuiTop() + 53, 14, 14, 176, 0, 14, BACKGROUND, 256, 256, this::walletTakeCoinPressed, Component.empty(), CoinItem.CoinValue.FIVE_HUNDRED));
-        takeFiveHundred.setTooltip(Tooltip.create(Component.translatable("text.wallets.take_coin", Component.translatable(CoinItem.CoinValue.FIVE_HUNDRED.getTranslation()))));
+        var takeOne = this.addRenderableWidget(new AddWalletButton(this.getGuiLeft() + 35, this.getGuiTop() + 53, 14, 14, 176, 0, 14, BACKGROUND, 256, 256, this::walletTakeCoinPressed, Component.empty(), Numismatics.Tier.SPUR));
+        takeOne.setTooltip(Tooltip.create(Component.translatable("text.wallets.take_coin", new ItemStack(Numismatics.getItemFor(Numismatics.Tier.SPUR)).getHoverName())));
+        var takeFive = this.addRenderableWidget(new AddWalletButton(this.getGuiLeft() + 53, this.getGuiTop() + 53, 14, 14, 176, 0, 14, BACKGROUND, 256, 256, this::walletTakeCoinPressed, Component.empty(), Numismatics.Tier.BEVEL));
+        takeFive.setTooltip(Tooltip.create(Component.translatable("text.wallets.take_coin", new ItemStack(Numismatics.getItemFor(Numismatics.Tier.BEVEL)).getHoverName())));
+        var takeTen = this.addRenderableWidget(new AddWalletButton(this.getGuiLeft() + 71, this.getGuiTop() + 53, 14, 14, 176, 0, 14, BACKGROUND, 256, 256, this::walletTakeCoinPressed, Component.empty(), Numismatics.Tier.SPROCKET));
+        takeTen.setTooltip(Tooltip.create(Component.translatable("text.wallets.take_coin", new ItemStack(Numismatics.getItemFor(Numismatics.Tier.SPROCKET)).getHoverName())));
+        var takeTwenty = this.addRenderableWidget(new AddWalletButton(this.getGuiLeft() + 89, this.getGuiTop() + 53, 14, 14, 176, 0, 14, BACKGROUND, 256, 256, this::walletTakeCoinPressed, Component.empty(), Numismatics.Tier.COG));
+        takeTwenty.setTooltip(Tooltip.create(Component.translatable("text.wallets.take_coin", new ItemStack(Numismatics.getItemFor(Numismatics.Tier.COG)).getHoverName())));
+        var takeFifty = this.addRenderableWidget(new AddWalletButton(this.getGuiLeft() + 107, this.getGuiTop() + 53, 14, 14, 176, 0, 14, BACKGROUND, 256, 256, this::walletTakeCoinPressed, Component.empty(), Numismatics.Tier.CROWN));
+        takeFifty.setTooltip(Tooltip.create(Component.translatable("text.wallets.take_coin", new ItemStack(Numismatics.getItemFor(Numismatics.Tier.CROWN)).getHoverName())));
+        var takeHundred = this.addRenderableWidget(new AddWalletButton(this.getGuiLeft() + 125, this.getGuiTop() + 53, 14, 14, 176, 0, 14, BACKGROUND, 256, 256, this::walletTakeCoinPressed, Component.empty(), Numismatics.Tier.SUN));
+        takeHundred.setTooltip(Tooltip.create(Component.translatable("text.wallets.take_coin", new ItemStack(Numismatics.getItemFor(Numismatics.Tier.SUN)).getHoverName())));
+        
 
         this.addRenderableWidget(new TakeButton(this.getGuiLeft() + 103, this.getGuiTop() + 93, 14, 14, 176, 0, 14, BACKGROUND, 256, 256, this::walletSumCoinsPressed, Component.empty()));
         if (!Config.CONFIG.disableCoinPouch.get()) {
@@ -97,6 +96,8 @@ public class WalletScreen extends AbstractContainerScreen<WalletContainer> imple
         int amount = 0;
         if (itemstack.getItem() instanceof ICoinContainer) {
             amount = ((ICoinContainer) itemstack.getItem()).getCoins(itemstack);
+        } else if (Numismatics.isSupported(itemstack.getItem())) {
+            amount = itemstack.getCount() * Numismatics.getUnitValue(itemstack.getItem());
         }
         Component text = Component.translatable("text.wallets.transfer", amount);
         if (menu.getWalletAmount() + amount > 999999999) {
@@ -139,21 +140,6 @@ public class WalletScreen extends AbstractContainerScreen<WalletContainer> imple
                 WalletsMod.dispatcher.sentToServer(new InputEventPacket(TAKE_COINS, value.toString()));
             }
         });
-    }
-
-    @Override
-    public void renderSlot(@Nonnull GuiGraphics graphics, @Nonnull Slot slot) {
-        if (slot instanceof WalletContainer.TakeOnlySlot) {
-            RenderSystem.enableDepthTest();
-            RenderSystem.enableBlend();
-            graphics.setColor(1, 1, 1, 0.2f);
-            RenderSystem.colorMask(true, true, true, true);
-            TextureAtlasSprite sprite = this.minecraft.getTextureAtlas(TextureAtlas.LOCATION_BLOCKS).apply(((WalletContainer.TakeOnlySlot) slot).getTexture());
-            graphics.blit(slot.x, slot.y, 0, 16, 16, sprite);
-            graphics.setColor(1, 1, 1, 1f);
-
-        }
-        super.renderSlot(graphics, slot);
     }
 
     private void walletCreateCoinPoach(Button b) {
@@ -199,25 +185,25 @@ public class WalletScreen extends AbstractContainerScreen<WalletContainer> imple
 
     private static class AddWalletButton extends ImageButton {
 
-        private final CoinItem.CoinValue value;
+        private final Numismatics.Tier value;
 
-        public AddWalletButton(int xPos, int yPos, int xSize, int ySize, int xTexPos, int yTexPos, int yTexDiff, ResourceLocation texture, OnPress pressable, CoinItem.CoinValue value) {
+        public AddWalletButton(int xPos, int yPos, int xSize, int ySize, int xTexPos, int yTexPos, int yTexDiff, ResourceLocation texture, OnPress pressable, Numismatics.Tier value) {
             super(xPos, yPos, xSize, ySize, xTexPos, yTexPos, yTexDiff, texture, pressable);
             this.value = value;
-            this.setTooltip(Tooltip.create(Component.translatable("text.wallets.take", value.getValue())));
+            this.setTooltip(Tooltip.create(Component.translatable("text.wallets.take", Numismatics.getUnit(value))));
         }
 
-        public AddWalletButton(int xPos, int yPos, int xSize, int ySize, int xTexPos, int yTexPos, int yTexDiff, ResourceLocation texture, int textureWidth, int textureHeight, OnPress pressable, CoinItem.CoinValue value) {
+        public AddWalletButton(int xPos, int yPos, int xSize, int ySize, int xTexPos, int yTexPos, int yTexDiff, ResourceLocation texture, int textureWidth, int textureHeight, OnPress pressable, Numismatics.Tier value) {
             super(xPos, yPos, xSize, ySize, xTexPos, yTexPos, yTexDiff, texture, textureWidth, textureHeight, pressable);
             this.value = value;
         }
 
-        public AddWalletButton(int xPos, int yPos, int xSize, int ySize, int xTexPos, int yTexPos, int yTexDiff, ResourceLocation texture, int textureWidth, int textureHeight, OnPress pressable, Component name, CoinItem.CoinValue value) {
+        public AddWalletButton(int xPos, int yPos, int xSize, int ySize, int xTexPos, int yTexPos, int yTexDiff, ResourceLocation texture, int textureWidth, int textureHeight, OnPress pressable, Component name, Numismatics.Tier value) {
             super(xPos, yPos, xSize, ySize, xTexPos, yTexPos, yTexDiff, texture, textureWidth, textureHeight, pressable, name);
             this.value = value;
         }
 
-        public CoinItem.CoinValue getValue() {
+        public Numismatics.Tier getValue() {
             return value;
         }
     }
